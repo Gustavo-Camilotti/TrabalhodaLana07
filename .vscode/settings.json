@@ -1,7 +1,9 @@
 {
     "C_Cpp.dimInactiveRegions": false,
     "files.associations": {
-        "bioma.h": "c"
+        "bioma.h": "c",
+        "classificacao.h": "c",
+        "string.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

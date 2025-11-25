@@ -41,9 +41,9 @@ void listar_biomas() {
 
         printf("\n===== Bioma %d =====\n", b.id_bioma);
         printf("Nome: %s\n", b.nome_bioma);
-        printf("Vegeta��o: %s\n", b.tipo_vegetacao);
+        printf("Vegetacao: %s\n", b.tipo_vegetacao);
         printf("Clima: %s\n", b.clima);
-        printf("Descri��o: %s\n", b.descricao);
+        printf("Descricao: %s\n", b.descricao);
         count++;
     }
 
@@ -74,7 +74,7 @@ int apagar_bioma(int id_alvo) {
     }
 
     fclose(fp);
-    printf("Bioma com ID %d n�o encontrado.\n", id_alvo);
+    printf("Bioma com ID %d nao encontrado.\n", id_alvo);
     return -1;
 }
 

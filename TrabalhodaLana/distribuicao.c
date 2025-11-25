@@ -14,13 +14,13 @@ __int64 salvar_distribuicao(const distribuicao_t *d) {
     __int64 offset = FTELL(fp);
 
     if (fwrite(d, sizeof(distribuicao_t), 1, fp) != 1) {
-        perror("Erro ao salvar distribui��o");
+        perror("Erro ao salvar distribuicao");
         fclose(fp);
         return -1;
     }
 
     fclose(fp);
-    printf("Distribui��o salva com sucesso (ID %d, offset %" PRId64 ").\n",
+    printf("Distribuicao salva com sucesso (ID %d, offset %" PRId64 ").\n",
            d->id_distribuicao, offset);
     return offset;
 }
@@ -35,21 +35,21 @@ void listar_distribuicoes() {
     distribuicao_t d;
     int count = 0;
 
-    printf("\n--- Lista de Distribui��es Geogr�ficas ---\n");
+    printf("\n--- Lista de Distribuicoes Geograficas ---\n");
 
     while (fread(&d, sizeof(distribuicao_t), 1, fp) == 1) {
         if (d.id_distribuicao == -1) continue; // ignorar apagados
 
-        printf("\n===== Distribui��o %d =====\n", d.id_distribuicao);
+        printf("\n===== Distribuicao %d =====\n", d.id_distribuicao);
         printf("Continente: %s\n", d.continente);
-        printf("Pa�s: %s\n", d.pais);
+        printf("Pais: %s\n", d.pais);
         printf("ID Bioma: %d\n", d.id_bioma);
         printf("ID Planta: %d\n", d.id_planta);
         count++;
     }
 
     fclose(fp);
-    printf("\nTotal de distribui��es exibidas: %d\n", count);
+    printf("\nTotal de distribuicoes exibidas: %d\n", count);
 }
 
 int apagar_distribuicao(int id_alvo) {
@@ -68,13 +68,13 @@ int apagar_distribuicao(int id_alvo) {
             FSEEK(fp, offset, SEEK_SET);
             fwrite(&d, sizeof(distribuicao_t), 1, fp);
             fclose(fp);
-            printf("Distribui��o %d apagada com sucesso.\n", id_alvo);
+            printf("Distribuicao %d apagada com sucesso.\n", id_alvo);
             return 0;
         }
         offset += sizeof(distribuicao_t);
     }
 
     fclose(fp);
-    printf("Distribui��o com ID %d n�o encontrada.\n", id_alvo);
+    printf("Distribuicao com ID %d nao encontrada.\n", id_alvo);
     return -1;
 }

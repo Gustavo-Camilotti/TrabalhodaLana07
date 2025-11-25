@@ -1,7 +1,7 @@
 #include "bplus.h"
 
 /**********************************************************************************************************************
-    Fun��es utilit�rias de n�
+    Funcoes utilitarias
 
 **********************************************************************************************************************/
 
@@ -56,7 +56,7 @@ int salvar_no(const char* entidade, __int64 offset, const bplus_no_t *no) {
     return 1;
 }
 
-// Retorna offset do novo n� em sucesso, -1 em erro.
+// Retorna offset do novo n em sucesso, -1 em erro.
 __int64 criar_no_folha(const char* entidade) {
     if (entidade == NULL) return -1;
 
@@ -81,7 +81,7 @@ __int64 criar_no_folha(const char* entidade) {
 }
 
 
-// Retorna offset do novo n� em sucesso, -1 em erro.
+// Retorna offset do novo n em sucesso, -1 em erro.
 __int64 criar_no_interno(const char* entidade) {
     if (entidade == NULL) return -1;
 
@@ -107,13 +107,13 @@ __int64 criar_no_interno(const char* entidade) {
 //---------------------------------------------------------------------------------------------------------------------
 
 /**********************************************************************************************************************
-    Fun��es de inser��o
+    Funcoes de insercao
 
 **********************************************************************************************************************/
 
-// Retorna -1 se n�o houve split (inser��o local), ou o offset do novo n� criado se houve split.
-// chave_promovida � v�lido apenas quando h� split.
-// entidade seleciona o �ndice correto ("plantas" ou "ocorrencias").
+// Retorna -1 se nao houve split (insercao local), ou o offset do novo no criado se houve split.
+// chave_promovida e valido apenas quando ha split.
+// entidade seleciona o indice correto ("plantas" ou "ocorrencias").
 __int64 inserir_bplus_recursivo(
     const char* entidade,
     __int64 no_offset,
@@ -130,10 +130,10 @@ __int64 inserir_bplus_recursivo(
     if (FSEEK(fp, no_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
     if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
 
-    // Caso 1: N� folha
+    // Caso 1: no folha
     if (no.eh_folha) {
         if (no.num_chaves < ORDEM) {
-            // Inser��o simples ordenada no n� folha
+            // insercao simples ordenada no no folha
             int i = no.num_chaves - 1;
             while (i >= 0 && id < no.chaves[i]) {
                 no.chaves[i+1]  = no.chaves[i];
@@ -165,7 +165,7 @@ __int64 inserir_bplus_recursivo(
             }
             no.num_chaves = meio;
 
-            // Inserir a nova chave no n� correto (no original ou na nova folha)
+            // Inserir a nova chave no no correto (no original ou na nova folha)
             if (id < novo_folha.chaves[0]) {
                 int i = no.num_chaves - 1;
                 while (i >= 0 && id < no.chaves[i]) {
@@ -195,21 +195,21 @@ __int64 inserir_bplus_recursivo(
             novo_folha.proximo = no.proximo;
             no.proximo         = novo_offset;
 
-            // Salva n� original e nova folha
+            // Salva no original e nova folha
             if (FSEEK(fp, no_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
             if (fwrite(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
             if (FSEEK(fp, novo_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
             if (fwrite(&novo_folha, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
             if (fflush(fp) != 0) { fclose(fp); return -1; }
 
-            // Em B+ tree, a chave promovida para o pai � a primeira chave da nova folha
+            // Em B+ tree, a chave promovida para o pai o a primeira chave da nova folha
             *chave_promovida = novo_folha.chaves[0];
             fclose(fp);
             return novo_offset;
         }
     }
 
-    // Caso 2: N� interno
+    // Caso 2: No interno
     int i = 0;
     while (i < no.num_chaves && id >= no.chaves[i]) {
         i++;
@@ -219,9 +219,9 @@ __int64 inserir_bplus_recursivo(
     __int64 novo_filho_offset = inserir_bplus_recursivo(entidade, no.filhos[i], id, dado_offset, &chave_promovida_filho);
 
     if (novo_filho_offset != -1) {
-        // O filho foi split e promoveu uma chave; inserir no n� interno atual
+        // O filho foi split e promoveu uma chave; inserir no no interno atual
         if (no.num_chaves < ORDEM) {
-            // Inser��o simples no n� interno (sem split)
+            // insercao simples no no interno (sem split)
             for (int j = no.num_chaves; j > i; j--) {
                 no.chaves[j] = no.chaves[j-1];
                 no.filhos[j+1] = no.filhos[j];
@@ -234,16 +234,16 @@ __int64 inserir_bplus_recursivo(
             if (fwrite(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
             if (fflush(fp) != 0) { fclose(fp); return -1; }
             fclose(fp);
-            return -1; // sem split no n� interno
+            return -1; // sem split no no interno
         } else {
-            // Split de n� interno
+            // Split de no interno
             bplus_no_t novo_interno;
             memset(&novo_interno, 0, sizeof(bplus_no_t));
             novo_interno.eh_folha = 0;
 
-            // Primeiro, inserimos a chave promovida do filho no no atual (em mem�ria)
-            // para depois fazer o split com o arranjo j� atualizado.
-            // Desloca para abrir espa�o
+            // Primeiro, inserimos a chave promovida do filho no no atual (em memAria)
+            // para depois fazer o split com o arranjo ja atualizado.
+            // Desloca para abrir espaco
             for (int j = no.num_chaves; j > i; j--) {
                 no.chaves[j]   = no.chaves[j-1];
                 no.filhos[j+1] = no.filhos[j];
@@ -252,68 +252,68 @@ __int64 inserir_bplus_recursivo(
             no.filhos[i+1] = novo_filho_offset;
             no.num_chaves++; // agora no.num_chaves == ORDEM + 1 (cheio com overflow)
 
-            int meio = no.num_chaves / 2; // mediana ap�s inserir
+            int meio = no.num_chaves / 2; // mediana apos inserir
             // A chave mediana sobe para o pai
             *chave_promovida = no.chaves[meio];
 
-            // Copiar metade direita para o novo n� interno
+            // Copiar metade direita para o novo no interno
             // Chaves: [meio+1 .. no.num_chaves-1]
-            // Filhos: [meio+1 .. no.num_chaves] (lembrando filhos s�o um a mais)
+            // Filhos: [meio+1 .. no.num_chaves] (lembrando filhos sao um a mais)
             for (int j = meio + 1; j < no.num_chaves; j++) {
                 novo_interno.chaves[novo_interno.num_chaves] = no.chaves[j];
                 novo_interno.filhos[novo_interno.num_chaves] = no.filhos[j];
                 novo_interno.num_chaves++;
             }
-            // �ltimo filho da direita
+            // ultimo filho da direita
             novo_interno.filhos[novo_interno.num_chaves] = no.filhos[no.num_chaves];
 
-            // Ajustar o n� original para ficar com a metade esquerda
-            // Ap�s a subida da mediana, o n� original fica com [0 .. meio-1] chaves
+            // Ajustar o no original para ficar com a metade esquerda
+            // apos a subida da mediana, o no original fica com [0 .. meio-1] chaves
             // Filhos [0 .. meio]
-            // N�o � necess�rio "limpar" os buffers; basta ajustar num_chaves
+            // noo e necessario "limpar" os buffers; basta ajustar num_chaves
             no.num_chaves = meio;
 
-            // Gravar novo n� no fim do arquivo
+            // Gravar novo no no fim do arquivo
             if (FSEEK(fp, 0, SEEK_END) != 0) { fclose(fp); return -1; }
             __int64 novo_offset = FTELL(fp);
             if (novo_offset < 0) { fclose(fp); return -1; }
             if (FSEEK(fp, novo_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
             if (fwrite(&novo_interno, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
 
-            // Atualizar n� original
+            // Atualizar no original
             if (FSEEK(fp, no_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
             if (fwrite(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
             if (fflush(fp) != 0) { fclose(fp); return -1; }
 
             fclose(fp);
-            // Retorna o offset do novo n� para o n�vel acima
+            // Retorna o offset do novo no para o novel acima
             return novo_offset;
         }
     }
 
     fclose(fp);
-    return -1; // Inser��o no filho n�o causou split
+    return -1; // insercao no filho noo causou split
 }
 
 // Cria raiz folha se raiz_offset == -1
-// Evita duplicatas: n�o insere se id j� existir
-// Atualiza raiz_offset e persiste ap�s split
+// Evita duplicatas: noo insere se id ja existir
+// Atualiza raiz_offset e persiste apos split
 int inserir_bplus(const char* entidade, __int64* raiz_offset, int id, __int64 dado_offset) {
     if (entidade == NULL || raiz_offset == NULL) return 0;
 
     // Checa duplicata
     __int64 ja_existe = buscar_bplus(entidade, *raiz_offset, id);
     if (ja_existe >= 0) {
-        // J� existe, n�o insere
+        // ja existe, noo insere
         return 1;
     }
 
-    // Se �rvore vazia, cria folha raiz
+    // Se arvore vazia, cria folha raiz
     if (*raiz_offset == -1) {
         __int64 folha = criar_no_folha(entidade);
         if (folha < 0) return 0;
 
-        // Inser��o trivial na folha rec�m-criada
+        // insercao trivial na folha recAm-criada
         int dummy_prom;
         __int64 split = inserir_bplus_recursivo(entidade, folha, id, dado_offset, &dummy_prom);
         if (split == -1) {
@@ -321,7 +321,7 @@ int inserir_bplus(const char* entidade, __int64* raiz_offset, int id, __int64 da
             salvar_raiz(*raiz_offset, entidade);
             return 1;
         } else {
-            // Se a pr�pria folha raiz splitou, cria nova raiz interna
+            // Se a prApria folha raiz splitou, cria nova raiz interna
             bplus_no_t nova;
             memset(&nova, 0, sizeof(bplus_no_t));
             nova.eh_folha = 0;
@@ -347,7 +347,7 @@ int inserir_bplus(const char* entidade, __int64* raiz_offset, int id, __int64 da
         }
     }
 
-    // Inser��o normal a partir da raiz existente
+    // insercao normal a partir da raiz existente
     int chave_promovida = -1;
     __int64 novo_offset = inserir_bplus_recursivo(entidade, *raiz_offset, id, dado_offset, &chave_promovida);
 
@@ -359,12 +359,12 @@ int inserir_bplus(const char* entidade, __int64* raiz_offset, int id, __int64 da
         nova_raiz.num_chaves = 1;
         nova_raiz.chaves[0] = chave_promovida;
         nova_raiz.filhos[0] = *raiz_offset; // raiz antiga
-        nova_raiz.filhos[1] = novo_offset;  // novo n�
+        nova_raiz.filhos[1] = novo_offset;  // novo no
 
         FILE* fp = fp_bplus(entidade);
         if (fp == NULL) return 0;
 
-        // Grava nova raiz no fim do arquivo �ndice
+        // Grava nova raiz no fim do arquivo indice
         if (FSEEK(fp, 0, SEEK_END) != 0) { fclose(fp); return 0; }
         __int64 nova_offset = FTELL(fp);
         if (nova_offset < 0) { fclose(fp); return 0; }
@@ -384,7 +384,7 @@ __int64 salvar_na_arvore_bplus(const char* entidade, int id, __int64 offset, __i
     FILE *fp = fp_bplus(entidade);
     if (fp == NULL) return -1;
 
-    // Caso inicial: �rvore vazia
+    // Caso inicial: arvore vazia
     if (raiz_offset == -1) {
         bplus_no_t raiz;
         memset(&raiz, 0, sizeof(bplus_no_t));
@@ -403,7 +403,7 @@ __int64 salvar_na_arvore_bplus(const char* entidade, int id, __int64 offset, __i
         return raiz_offset;
     }
 
-    // Inser��o recursiva
+    // insercao recursiva
     int chave_promovida;
     __int64 novo_filho_offset = inserir_bplus_recursivo(entidade, raiz_offset, id, offset, &chave_promovida);;
 
@@ -431,12 +431,12 @@ __int64 salvar_na_arvore_bplus(const char* entidade, int id, __int64 offset, __i
 //---------------------------------------------------------------------------------------------------------------------
 
 /**********************************************************************************************************************
-    Fun��es de remo��o
+    Funoces de remocao
 
 **********************************************************************************************************************/
 
-// Funde duas folhas vizinhas e retorna o offset do n� resultante.
-// chave_removida_pai recebe a chave que deve ser removida do n� pai.
+// Funde duas folhas vizinhas e retorna o offset do no resultante.
+// chave_removida_pai recebe a chave que deve ser removida do no pai.
 __int64 fundir_folhas(const char* entidade, __int64 no_offset, __int64 irmao_offset, int *chave_removida_pai) {
     if (entidade == NULL || chave_removida_pai == NULL) return -1;
 
@@ -451,9 +451,9 @@ __int64 fundir_folhas(const char* entidade, __int64 no_offset, __int64 irmao_off
     if (fread(&irmao, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
 
     if (irmao.chaves[0] < no.chaves[0]) {
-        // Irm�o � esquerda: funde 'no' dentro de 'irmao'
+        // irmao a esquerda: funde 'no' dentro de 'irmao'
         for (int i = 0; i < no.num_chaves; i++) {
-            if (irmao.num_chaves >= ORDEM) break; // prote��o contra overflow
+            if (irmao.num_chaves >= ORDEM) break; // protecao contra overflow
             irmao.chaves[irmao.num_chaves]  = no.chaves[i];
             irmao.offsets[irmao.num_chaves] = no.offsets[i];
             irmao.num_chaves++;
@@ -468,9 +468,9 @@ __int64 fundir_folhas(const char* entidade, __int64 no_offset, __int64 irmao_off
         fclose(fp);
         return irmao_offset;
     } else {
-        // Irm�o � direita: funde 'irmao' dentro de 'no'
+        // irmao a direita: funde 'irmao' dentro de 'no'
         for (int i = 0; i < irmao.num_chaves; i++) {
-            if (no.num_chaves >= ORDEM) break; // prote��o contra overflow
+            if (no.num_chaves >= ORDEM) break; // protecao contra overflow
             no.chaves[no.num_chaves]  = irmao.chaves[i];
             no.offsets[no.num_chaves] = irmao.offsets[i];
             no.num_chaves++;
@@ -487,7 +487,7 @@ __int64 fundir_folhas(const char* entidade, __int64 no_offset, __int64 irmao_off
     }
 }
 
-// Funde dois n�s internos e retorna o offset do n� resultante.
+// Funde dois nos internos e retorna o offset do no resultante.
 // chave_removida_pai recebe a chave separadora que deve ser removida do pai.
 __int64 fundir_internos(const char* entidade, __int64 no_offset, __int64 irmao_offset, int chave_pai, int *chave_removida_pai) {
     if (entidade == NULL || chave_removida_pai == NULL) return -1;
@@ -503,14 +503,14 @@ __int64 fundir_internos(const char* entidade, __int64 no_offset, __int64 irmao_o
     if (fread(&irmao, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
 
     if (irmao.chaves[0] < no.chaves[0]) {
-        // Irm�o � esquerda: funde 'no' dentro de 'irmao'
+        // irmao a esquerda: funde 'no' dentro de 'irmao'
         if (irmao.num_chaves < ORDEM) {
             irmao.chaves[irmao.num_chaves] = chave_pai;
             irmao.num_chaves++;
         }
 
         for (int i = 0; i < no.num_chaves; i++) {
-            if (irmao.num_chaves >= ORDEM) break; // prote��o contra overflow
+            if (irmao.num_chaves >= ORDEM) break; // protecao contra overflow
             irmao.chaves[irmao.num_chaves] = no.chaves[i];
             irmao.filhos[irmao.num_chaves] = no.filhos[i];
             irmao.num_chaves++;
@@ -525,14 +525,14 @@ __int64 fundir_internos(const char* entidade, __int64 no_offset, __int64 irmao_o
         fclose(fp);
         return irmao_offset;
     } else {
-        // Irm�o � direita: funde 'irmao' dentro de 'no'
+        // irmao a direita: funde 'irmao' dentro de 'no'
         if (no.num_chaves < ORDEM) {
             no.chaves[no.num_chaves] = chave_pai;
             no.num_chaves++;
         }
 
         for (int i = 0; i < irmao.num_chaves; i++) {
-            if (no.num_chaves >= ORDEM) break; // prote��o contra overflow
+            if (no.num_chaves >= ORDEM) break; // protecao contra overflow
             no.chaves[no.num_chaves] = irmao.chaves[i];
             no.filhos[no.num_chaves] = irmao.filhos[i];
             no.num_chaves++;
@@ -550,7 +550,7 @@ __int64 fundir_internos(const char* entidade, __int64 no_offset, __int64 irmao_o
 }
 
 // Redistribui chaves entre folhas vizinhas.
-// atualizar_pai recebe a nova chave separadora para o n� pai.
+// atualizar_pai recebe a nova chave separadora para o no pai.
 void redistribuir_folha(const char* entidade, __int64 no_offset, __int64 irmao_offset, int *atualizar_pai) {
     if (entidade == NULL || atualizar_pai == NULL) return;
 
@@ -568,8 +568,8 @@ void redistribuir_folha(const char* entidade, __int64 no_offset, __int64 irmao_o
 
     if (irmao.num_chaves > minimo) {
         if (irmao.chaves[0] < no.chaves[0]) {
-            // Redistribui��o do irm�o � esquerda
-            if (no.num_chaves >= ORDEM) { fclose(fp); return; } // prote��o
+            // redistribuicao do irmao a esquerda
+            if (no.num_chaves >= ORDEM) { fclose(fp); return; } // protecao
             for (int i = no.num_chaves; i > 0; i--) {
                 no.chaves[i]  = no.chaves[i-1];
                 no.offsets[i] = no.offsets[i-1];
@@ -581,8 +581,8 @@ void redistribuir_folha(const char* entidade, __int64 no_offset, __int64 irmao_o
 
             *atualizar_pai = no.chaves[0]; // nova separadora
         } else {
-            // Redistribui��o do irm�o � direita
-            if (no.num_chaves >= ORDEM) { fclose(fp); return; } // prote��o
+            // redistribuicao do irmao a direita
+            if (no.num_chaves >= ORDEM) { fclose(fp); return; } // protecao
             no.chaves[no.num_chaves]  = irmao.chaves[0];
             no.offsets[no.num_chaves] = irmao.offsets[0];
             no.num_chaves++;
@@ -596,7 +596,7 @@ void redistribuir_folha(const char* entidade, __int64 no_offset, __int64 irmao_o
             *atualizar_pai = irmao.chaves[0]; // nova separadora
         }
 
-        // Grava os dois n�s atualizados
+        // Grava os dois nos atualizados
         if (FSEEK(fp, no_offset, SEEK_SET) == 0) fwrite(&no, sizeof(bplus_no_t), 1, fp);
         if (FSEEK(fp, irmao_offset, SEEK_SET) == 0) fwrite(&irmao, sizeof(bplus_no_t), 1, fp);
         fflush(fp);
@@ -605,8 +605,8 @@ void redistribuir_folha(const char* entidade, __int64 no_offset, __int64 irmao_o
     fclose(fp);
 }
 
-// Remove uma chave de uma folha. Retorna -1 se remo��o ok ou redistribui��o,
-// ou o offset do n� sobrevivente se houve fus�o.
+// Remove uma chave de uma folha. Retorna -1 se remocao ok ou redistribuicao,
+// ou o offset do no sobrevivente se houve fusao.
 __int64 remover_bplus_folha(const char* entidade, __int64 no_offset, int id,
                             __int64 irmao_offset, int chave_pai,
                             int *chave_promovida) {
@@ -617,7 +617,7 @@ __int64 remover_bplus_folha(const char* entidade, __int64 no_offset, int id,
 
     bplus_no_t no, irmao;
 
-    // Carregar n� alvo
+    // Carregar no alvo
     if (FSEEK(fp, no_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
     if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
 
@@ -626,7 +626,7 @@ __int64 remover_bplus_folha(const char* entidade, __int64 no_offset, int id,
     for (int i = 0; i < no.num_chaves; i++) {
         if (no.chaves[i] == id) { pos = i; break; }
     }
-    if (pos == -1) { fclose(fp); return -1; } // n�o encontrada
+    if (pos == -1) { fclose(fp); return -1; } // noo encontrada
 
     // Remover deslocando
     for (int i = pos; i < no.num_chaves - 1; i++) {
@@ -635,7 +635,7 @@ __int64 remover_bplus_folha(const char* entidade, __int64 no_offset, int id,
     }
     no.num_chaves--;
 
-    // Salvar n� atualizado
+    // Salvar no atualizado
     if (FSEEK(fp, no_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
     if (fwrite(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
     if (fflush(fp) != 0) { fclose(fp); return -1; }
@@ -643,27 +643,27 @@ __int64 remover_bplus_folha(const char* entidade, __int64 no_offset, int id,
     // Verificar underflow
     int minimo = (ORDEM + 1) / 2;
     if (no.num_chaves < minimo) {
-        // Carregar irm�o
+        // Carregar irmao
         if (FSEEK(fp, irmao_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
         if (fread(&irmao, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
 
         if (irmao.num_chaves > minimo) {
-            // Redistribui��o
+            // redistribuicao
             int nova_chave_pai;
             redistribuir_folha(entidade, no_offset, irmao_offset, &nova_chave_pai);
             *chave_promovida = nova_chave_pai;
             fclose(fp);
-            return -1; // redistribui��o resolveu
+            return -1; // redistribuicao resolveu
         } else {
-            // Fus�o
+            // Fusao
             __int64 sobrevivente = fundir_folhas(entidade, no_offset, irmao_offset, chave_promovida);
             fclose(fp);
-            return sobrevivente; // sinaliza fus�o para o pai
+            return sobrevivente; // sinaliza fusao para o pai
         }
     }
 
     fclose(fp);
-    return -1; // remo��o ok, sem underflow
+    return -1; // remocao ok, sem underflow
 }
 
 
@@ -680,13 +680,13 @@ __int64 remover_bplus_recursivo(const char* entidade, __int64 no_offset, int id,
 
     int minimo = (ORDEM + 1) / 2;
 
-    // Caso 1: N� folha
+    // Caso 1: no folha
     if (no.eh_folha) {
         fclose(fp);
         return remover_bplus_folha(entidade, no_offset, id, -1, -1, chave_promovida);
     }
 
-    // Caso 2: N� interno
+    // Caso 2: no interno
     int i = 0;
     while (i < no.num_chaves && id >= no.chaves[i]) i++;
 
@@ -697,7 +697,7 @@ __int64 remover_bplus_recursivo(const char* entidade, __int64 no_offset, int id,
         __int64 irmao_offset;
         int chave_removida_pai;
 
-        if (i > 0) { // irm�o � esquerda
+        if (i > 0) { // irmao A esquerda
             irmao_offset = no.filhos[i-1];
 
             bplus_no_t filho;
@@ -729,7 +729,7 @@ __int64 remover_bplus_recursivo(const char* entidade, __int64 no_offset, int id,
                     no.num_chaves--;
                 }
             }
-        } else if (i < no.num_chaves) { // irm�o � direita
+        } else if (i < no.num_chaves) { // irmao A direita
             irmao_offset = no.filhos[i+1];
 
             bplus_no_t filho;
@@ -770,7 +770,7 @@ __int64 remover_bplus_recursivo(const char* entidade, __int64 no_offset, int id,
 
         if (no.num_chaves < minimo) {
             fclose(fp);
-            return no_offset; // sinaliza underflow para n�vel acima
+            return no_offset; // sinaliza underflow para novel acima
         }
     }
 
@@ -785,7 +785,7 @@ __int64 remover_bplus(const char* entidade, __int64 raiz_offset, int id) {
     int chave_promovida;
     remover_bplus_recursivo(entidade, raiz_offset, id, &chave_promovida);;
 
-    // Carrega a raiz para verificar se houve altera��o
+    // Carrega a raiz para verificar se houve alteracao
     bplus_no_t raiz;
     if (FSEEK(fp, raiz_offset, SEEK_SET) != 0) return -1;
     if (fread(&raiz, sizeof(bplus_no_t), 1, fp) != 1) return -1;
@@ -793,10 +793,10 @@ __int64 remover_bplus(const char* entidade, __int64 raiz_offset, int id) {
     // Caso especial: raiz sem chaves
     if (raiz.num_chaves == 0) {
         if (raiz.eh_folha) {
-            // �rvore ficou vazia
+            // arvore ficou vazia
             return -1;
         } else {
-            // Nova raiz passa a ser o �nico filho
+            // Nova raiz passa a ser o unico filho
             return raiz.filhos[0];
         }
     }
@@ -807,19 +807,19 @@ __int64 remover_bplus(const char* entidade, __int64 raiz_offset, int id) {
 //---------------------------------------------------------------------------------------------------------------------
 
 /**********************************************************************************************************************
-    Fun��es de Impress�o e Navega��o
+    Funoces de Impressao e Navegacao
 
 **********************************************************************************************************************/
 
 void imprimir_bplus(const char* entidade, __int64 raiz_offset, int nivel) {
     if (raiz_offset == -1) {
-        printf("�rvore B+ vazia.\n");
+        printf("arvore B+ vazia.\n");
         return;
     }
 
     FILE *fp = fp_bplus(entidade);
     if (fp == NULL) {
-        perror("Erro ao abrir �ndice");
+        perror("Erro ao abrir indice");
         return;
     }
 
@@ -827,11 +827,11 @@ void imprimir_bplus(const char* entidade, __int64 raiz_offset, int nivel) {
     if (FSEEK(fp, raiz_offset, SEEK_SET) != 0) { fclose(fp); return; }
     if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return; }
 
-    // indenta��o por n�vel
+    // indentacao por novel
     for (int i = 0; i < nivel; i++) printf("  ");
 
-    // imprime o n� atual
-    printf("N� em offset %" PRId64 " | ", raiz_offset);
+    // imprime o no atual
+    printf("no em offset %" PRId64 " | ", raiz_offset);
     printf("%s | ", no.eh_folha ? "Folha" : "Interno");
     printf("Chaves: ");
     for (int i = 0; i < no.num_chaves; i++) {
@@ -841,7 +841,7 @@ void imprimir_bplus(const char* entidade, __int64 raiz_offset, int nivel) {
 
     fclose(fp);
 
-    // se n�o for folha, imprime recursivamente os filhos
+    // se noo for folha, imprime recursivamente os filhos
     if (!no.eh_folha) {
         for (int i = 0; i <= no.num_chaves; i++) {
             imprimir_bplus(entidade, no.filhos[i], nivel + 1);
@@ -852,7 +852,7 @@ void imprimir_bplus(const char* entidade, __int64 raiz_offset, int nivel) {
 
 int contar_registros_bplus(const char* entidade, __int64 raiz_offset) {
     if (raiz_offset == -1) {
-        return 0; // �rvore vazia
+        return 0; // arvore vazia
     }
 
     FILE *fp = fp_bplus(entidade);
@@ -863,7 +863,7 @@ int contar_registros_bplus(const char* entidade, __int64 raiz_offset) {
     if (FSEEK(fp, raiz_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
     if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
 
-    // Navega at� a folha mais � esquerda
+    // Navega ata a folha mais a esquerda
     while (!no.eh_folha) {
         if (FSEEK(fp, no.filhos[0], SEEK_SET) != 0) { fclose(fp); return -1; }
         if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
@@ -888,7 +888,7 @@ int contar_registros_bplus(const char* entidade, __int64 raiz_offset) {
 
 void listar_bplus_pagina_total(const char* entidade, __int64 raiz_offset, int tamanho_pagina, int pagina_desejada) {
     if (raiz_offset == -1) {
-        printf("�rvore B+ vazia.\n");
+        printf("arvore B+ vazia.\n");
         return;
     }
 
@@ -901,13 +901,13 @@ void listar_bplus_pagina_total(const char* entidade, __int64 raiz_offset, int ta
     int total_paginas = (total_registros + tamanho_pagina - 1) / tamanho_pagina;
 
     if (pagina_desejada < 1 || pagina_desejada > total_paginas) {
-        printf("P�gina inv�lida. Existem %d p�ginas dispon�veis.\n", total_paginas);
+        printf("pagina invAlida. Existem %d paginas disponoveis.\n", total_paginas);
         return;
     }
 
     FILE *fp = fp_bplus(entidade);
     if (fp == NULL) {
-        perror("Erro ao abrir �ndice");
+        perror("Erro ao abrir indice");
         return;
     }
 
@@ -915,7 +915,7 @@ void listar_bplus_pagina_total(const char* entidade, __int64 raiz_offset, int ta
     if (FSEEK(fp, raiz_offset, SEEK_SET) != 0) { fclose(fp); return; }
     if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return; }
 
-    // Navega at� a folha mais � esquerda
+    // Navega ate a folha mais a esquerda
     while (!no.eh_folha) {
         if (FSEEK(fp, no.filhos[0], SEEK_SET) != 0) { fclose(fp); return; }
         if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return; }
@@ -932,7 +932,7 @@ void listar_bplus_pagina_total(const char* entidade, __int64 raiz_offset, int ta
             if (contador >= inicio_pagina && contador <= fim_pagina) {
                 printf("ID: %d -> Offset: %" PRId64 "\n", no.chaves[i], no.offsets[i]);
             }
-            if (contador > fim_pagina) break; // j� exibiu a p�gina completa
+            if (contador > fim_pagina) break; // ja exibiu a pagina completa
         }
 
         if (contador > fim_pagina || no.proximo == -1) break;
@@ -943,7 +943,7 @@ void listar_bplus_pagina_total(const char* entidade, __int64 raiz_offset, int ta
 
     fclose(fp);
 
-    printf("---- P�gina %d de %d exibida ----\n", pagina_desejada, total_paginas);
+    printf("---- pagina %d de %d exibida ----\n", pagina_desejada, total_paginas);
 }
 
 
@@ -951,7 +951,7 @@ void listar_bplus_pagina_total(const char* entidade, __int64 raiz_offset, int ta
 //---------------------------------------------------------------------------------------------------------------------
 
 /**********************************************************************************************************************
-    Fun��es de Persist�ncia
+    Funoces de Persistencia
 
 **********************************************************************************************************************/
 
@@ -961,9 +961,9 @@ FILE* fp_bplus(const char* entidade) {
 
     FILE *fp = fopen(path, "r+b");
     if (fp == NULL) {
-        fp = fopen(path, "w+b"); // cria se n�o existir
+        fp = fopen(path, "w+b"); // cria se noo existir
         if (fp == NULL) {
-            perror("Erro ao abrir/criar �ndice B+");
+            perror("Erro ao abrir/criar indice B+");
             return NULL;
         }
     }
@@ -983,7 +983,7 @@ void salvar_raiz(__int64 raiz_offset, const char* entidade) {
 
     FILE *fp = fopen(path, "wb");
     if (fp == NULL) {
-        perror("Erro ao abrir meta do �ndice B+");
+        perror("Erro ao abrir meta do indice B+");
         return;
     }
 
@@ -1022,7 +1022,7 @@ __int64 buscar_bplus(const char* entidade, __int64 raiz_offset, int id) {
     if (FSEEK(fp, raiz_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
     if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
 
-    // Caso 1: N� folha
+    // Caso 1: no folha
     if (no.eh_folha) {
         for (int i = 0; i < no.num_chaves; i++) {
             if (no.chaves[i] == id) {
@@ -1032,10 +1032,10 @@ __int64 buscar_bplus(const char* entidade, __int64 raiz_offset, int id) {
             }
         }
         fclose(fp);
-        return -1; // n�o encontrado
+        return -1; // noo encontrado
     }
 
-    // Caso 2: N� interno
+    // Caso 2: no interno
     int i = 0;
     while (i < no.num_chaves && id >= no.chaves[i]) {
         i++;
@@ -1050,13 +1050,13 @@ __int64 buscar_bplus(const char* entidade, __int64 raiz_offset, int id) {
 
 void listar_bplus_paginado(const char* entidade, __int64 raiz_offset, int tamanho_pagina) {
     if (raiz_offset == -1) {
-        printf("�rvore B+ vazia.\n");
+        printf("arvore B+ vazia.\n");
         return;
     }
 
     FILE *fp = fp_bplus(entidade);
     if (fp == NULL) {
-        perror("Erro ao abrir �ndice");
+        perror("Erro ao abrir indice");
         return;
     }
 
@@ -1064,7 +1064,7 @@ void listar_bplus_paginado(const char* entidade, __int64 raiz_offset, int tamanh
     if (FSEEK(fp, raiz_offset, SEEK_SET) != 0) { fclose(fp); return; }
     if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return; }
 
-    // Navega at� a folha mais � esquerda
+    // Navega atA a folha mais A esquerda
     while (!no.eh_folha) {
         if (FSEEK(fp, no.filhos[0], SEEK_SET) != 0) { fclose(fp); return; }
         if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return; }
@@ -1080,7 +1080,7 @@ void listar_bplus_paginado(const char* entidade, __int64 raiz_offset, int tamanh
             contador++;
 
             if (contador % tamanho_pagina == 0) {
-                printf("---- P�gina %d conclu�da ----\n", pagina);
+                printf("---- pagina %d concluida ----\n", pagina);
                 pagina++;
                 printf("Pressione ENTER para continuar...\n");
                 getchar();
@@ -1095,9 +1095,9 @@ void listar_bplus_paginado(const char* entidade, __int64 raiz_offset, int tamanh
 
     fclose(fp);
 
-    // Se terminar sem completar a �ltima p�gina
+    // Se terminar sem completar a Altima pagina
     if (contador % tamanho_pagina != 0) {
-        printf("---- P�gina %d conclu�da ----\n", pagina);
+        printf("---- pagina %d concluida ----\n", pagina);
     }
 }
 
@@ -1107,7 +1107,7 @@ void listar_bplus_pagina(FILE *fp, __int64 raiz_offset, int tamanho_pagina, int 
     if (FSEEK(fp, raiz_offset, SEEK_SET) != 0) return;
     if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) return;
 
-    // Navega at� a folha mais � esquerda
+    // Navega atA a folha mais A esquerda
     while (!no.eh_folha) {
         if (FSEEK(fp, no.filhos[0], SEEK_SET) != 0) return;
         if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) return;
@@ -1124,7 +1124,7 @@ void listar_bplus_pagina(FILE *fp, __int64 raiz_offset, int tamanho_pagina, int 
             if (contador >= inicio_pagina && contador <= fim_pagina) {
                 printf("ID: %d -> Offset: %" PRId64 "\n", no.chaves[i], no.offsets[i]);
             }
-            if (contador > fim_pagina) break; // j� exibiu a p�gina completa
+            if (contador > fim_pagina) break; // ja exibiu a pagina completa
         }
 
         if (contador > fim_pagina || no.proximo == -1) break;
@@ -1133,13 +1133,13 @@ void listar_bplus_pagina(FILE *fp, __int64 raiz_offset, int tamanho_pagina, int 
         if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) break;
     }
 
-    printf("---- P�gina %d exibida ----\n", pagina_desejada);
+    printf("---- pagina %d exibida ----\n", pagina_desejada);
 }
 */
 
 void listar_bplus_pagina(const char* entidade, __int64 raiz_offset, int tamanho_pagina, int pagina_desejada) {
     if (raiz_offset == -1) {
-        printf("�rvore B+ vazia.\n");
+        printf("arvore B+ vazia.\n");
         return;
     }
 
@@ -1152,13 +1152,13 @@ void listar_bplus_pagina(const char* entidade, __int64 raiz_offset, int tamanho_
     int total_paginas = (total_registros + tamanho_pagina - 1) / tamanho_pagina;
 
     if (pagina_desejada < 1 || pagina_desejada > total_paginas) {
-        printf("P�gina inv�lida. Existem %d p�ginas dispon�veis.\n", total_paginas);
+        printf("pagina invalida. Existem %d paginas disponoveis.\n", total_paginas);
         return;
     }
 
     FILE *fp = fp_bplus(entidade);
     if (fp == NULL) {
-        perror("Erro ao abrir �ndice");
+        perror("Erro ao abrir indice");
         return;
     }
 
@@ -1166,7 +1166,7 @@ void listar_bplus_pagina(const char* entidade, __int64 raiz_offset, int tamanho_
     if (FSEEK(fp, raiz_offset, SEEK_SET) != 0) { fclose(fp); return; }
     if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return; }
 
-    // Navega at� a folha mais � esquerda
+    // Navega atA a folha mais A esquerda
     while (!no.eh_folha) {
         if (FSEEK(fp, no.filhos[0], SEEK_SET) != 0) { fclose(fp); return; }
         if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return; }
@@ -1183,7 +1183,7 @@ void listar_bplus_pagina(const char* entidade, __int64 raiz_offset, int tamanho_
             if (contador >= inicio_pagina && contador <= fim_pagina) {
                 printf("ID: %d -> Offset: %" PRId64 "\n", no.chaves[i], no.offsets[i]);
             }
-            if (contador > fim_pagina) break; // j� exibiu a p�gina completa
+            if (contador > fim_pagina) break; // ja exibiu a pagina completa
         }
 
         if (contador > fim_pagina || no.proximo == -1) break;
@@ -1194,7 +1194,7 @@ void listar_bplus_pagina(const char* entidade, __int64 raiz_offset, int tamanho_
 
     fclose(fp);
 
-    printf("---- P�gina %d de %d exibida ----\n", pagina_desejada, total_paginas);
+    printf("---- pagina %d de %d exibida ----\n", pagina_desejada, total_paginas);
 }
 
 
@@ -1209,7 +1209,7 @@ __int64 dividir_folha(const char* entidade, __int64 folha_offset, int *chave_pro
     if (FSEEK(fp, folha_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
     if (fread(&folha, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
 
-    if (folha.num_chaves < 2) { fclose(fp); return -1; } // n�o h� como dividir
+    if (folha.num_chaves < 2) { fclose(fp); return -1; } // noo hA como dividir
 
     int meio = folha.num_chaves / 2;
 
@@ -1228,7 +1228,7 @@ __int64 dividir_folha(const char* entidade, __int64 folha_offset, int *chave_pro
     // encadeamento
     nova_folha.proximo = folha.proximo;
 
-    // posi��o da nova folha no fim do arquivo
+    // posiAAo da nova folha no fim do arquivo
     if (FSEEK(fp, 0, SEEK_END) != 0) { fclose(fp); return -1; }
     __int64 nova_offset = FTELL(fp);
     if (nova_offset < 0) { fclose(fp); return -1; }
@@ -1262,11 +1262,11 @@ __int64 dividir_interno(const char* entidade, __int64 no_offset, int *chave_prom
     if (FSEEK(fp, no_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
     if (fread(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
 
-    if (no.num_chaves < 2) { fclose(fp); return -1; } // n�o h� como dividir
+    if (no.num_chaves < 2) { fclose(fp); return -1; } // noo hA como dividir
 
     int meio = no.num_chaves / 2;
 
-    // chave do meio ser� promovida
+    // chave do meio serA promovida
     *chave_promovida = no.chaves[meio];
 
     bplus_no_t novo_no;
@@ -1283,10 +1283,10 @@ __int64 dividir_interno(const char* entidade, __int64 no_offset, int *chave_prom
         novo_no.filhos[i] = no.filhos[meio + 1 + i];
     }
 
-    // ajustar n� original (metade esquerda)
+    // ajustar no original (metade esquerda)
     no.num_chaves = meio;
 
-    // salvar novo n� no fim do arquivo
+    // salvar novo no no fim do arquivo
     if (FSEEK(fp, 0, SEEK_END) != 0) { fclose(fp); return -1; }
     __int64 novo_offset = FTELL(fp);
     if (novo_offset < 0) { fclose(fp); return -1; }
@@ -1294,7 +1294,7 @@ __int64 dividir_interno(const char* entidade, __int64 no_offset, int *chave_prom
     if (FSEEK(fp, novo_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
     if (fwrite(&novo_no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
 
-    // regravar n� original
+    // regravar no original
     if (FSEEK(fp, no_offset, SEEK_SET) != 0) { fclose(fp); return -1; }
     if (fwrite(&no, sizeof(bplus_no_t), 1, fp) != 1) { fclose(fp); return -1; }
 
@@ -1304,7 +1304,7 @@ __int64 dividir_interno(const char* entidade, __int64 no_offset, int *chave_prom
     return novo_offset;
 }
 
-// Edita um campo de string: mostra valor atual, pede novo valor e atualiza se n�o for vazio
+// Edita um campo de string: mostra valor atual, pede novo valor e atualiza se noo for vazio
 void editar_campo_string(const char *rotulo, char *campo, int tamanho) {
     char buffer[200];
 
@@ -1314,6 +1314,6 @@ void editar_campo_string(const char *rotulo, char *campo, int tamanho) {
     if (fgets(buffer, sizeof(buffer), stdin) && buffer[0] != '\n') {
         buffer[strcspn(buffer, "\n")] = '\0'; // remove \n
         strncpy(campo, buffer, tamanho - 1);
-        campo[tamanho - 1] = '\0'; // garante termina��o
+        campo[tamanho - 1] = '\0'; // garante terminaAAo
     }
 }

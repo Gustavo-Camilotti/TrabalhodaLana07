@@ -25,7 +25,7 @@ __int64 salvar_planta(const planta_t *planta) {
     }
     fclose(fp_dados);
 
-    // Inserir na árvore B+ de plantas
+    // Inserir na arvore B+ de plantas
     FILE *fp_idx = fp_bplus("plantas");
     __int64 raiz_offset = carregar_raiz("plantas");
     raiz_offset = salvar_na_arvore_bplus("plantas", planta->id_planta, offset, raiz_offset);
@@ -48,7 +48,7 @@ void listar_plantas(const char* entidade, __int64 raiz_offset) {
         return;
     }
 
-    FILE *fp_idx = fp_bplus(entidade);  // abre índice correto
+    FILE *fp_idx = fp_bplus(entidade);  // abre indice correto
     bplus_no_t no;
 
     if (_fseeki64(fp_idx, raiz_offset, SEEK_SET) != 0) { fclose(fp_dados); fclose(fp_idx); return; }
@@ -78,18 +78,18 @@ void listar_plantas(const char* entidade, __int64 raiz_offset) {
             if (p.id_planta == -1) continue;
 
             printf("ID: %d\n", p.id_planta);
-            printf("Nome Científico: %s\n", p.nome_cientifico);
+            printf("Nome Cientifico: %s\n", p.nome_cientifico);
             printf("Nome Popular: %s\n", p.nome_popular);
             printf("Tipo: %s\n", p.tipo);
-            printf("Status de Conservação: %s\n", p.status_conservacao);
-            printf("Descrição: %s\n", p.descricao);
+            printf("Status de Conservacao: %s\n", p.status_conservacao);
+            printf("Descricao: %s\n", p.descricao);
             printf("Data de Registro: %s\n", p.data_registro);
             printf("------------------------\n");
 
             contador++;
 
             if (contador % TAM_PAGINA == 0) {
-                printf("---- Página %d concluída ----\n", pagina);
+                printf("---- Pagina %d concluida ----\n", pagina);
                 pagina++;
                 printf("Pressione ENTER para continuar ou Q para sair...\n");
 
@@ -105,7 +105,7 @@ void listar_plantas(const char* entidade, __int64 raiz_offset) {
     }
 
     if (contador % TAM_PAGINA != 0) {
-        printf("---- Página %d concluída ----\n", pagina);
+        printf("---- Pagina %d concluida ----\n", pagina);
     }
 
     printf("Total de registros exibidos: %d\n", contador);
@@ -121,10 +121,10 @@ void editar_planta(const char* entidade, __int64 raiz_offset, int id_alvo) {
         return;
     }
 
-    // Busca offset da planta pelo índice de plantas
+    // Busca offset da planta pelo indice de plantas
     __int64 offset = buscar_bplus(entidade, raiz_offset, id_alvo);
     if (offset == -1) {
-        printf("Planta com ID %d não encontrada.\n", id_alvo);
+        printf("Planta com ID %d nao encontrada.\n", id_alvo);
         fclose(fp);
         return;
     }
@@ -135,11 +135,11 @@ void editar_planta(const char* entidade, __int64 raiz_offset, int id_alvo) {
 
     printf("\n--- Planta encontrada ---\n");
 
-    editar_campo_string("Nome Científico", p.nome_cientifico, sizeof(p.nome_cientifico));
+    editar_campo_string("Nome Cientifico", p.nome_cientifico, sizeof(p.nome_cientifico));
     editar_campo_string("Nome Popular", p.nome_popular, sizeof(p.nome_popular));
     editar_campo_string("Tipo", p.tipo, sizeof(p.tipo));
-    editar_campo_string("Status de Conservação", p.status_conservacao, sizeof(p.status_conservacao));
-    editar_campo_string("Descrição", p.descricao, sizeof(p.descricao));
+    editar_campo_string("Status de Conservacao", p.status_conservacao, sizeof(p.status_conservacao));
+    editar_campo_string("Descricao", p.descricao, sizeof(p.descricao));
     editar_campo_string("Data de Registro (AAAA-MM-DD)", p.data_registro, sizeof(p.data_registro));
 
     if (_fseeki64(fp, offset, SEEK_SET) != 0) { fclose(fp); return; }
@@ -179,17 +179,17 @@ void exibir_nomes_ordenados(int pagina) {
     // Ordena por nome popular
     qsort(plantas, total, sizeof(planta_t), comparar_nome_popular);
 
-    // Paginação: TAM_PAGINA por página
+    // Paginacao: TAM_PAGINA por pagina
     int inicio = pagina * TAM_PAGINA;
     int fim = inicio + TAM_PAGINA;
     if (inicio >= total) {
-        printf("Página %d está fora do intervalo. Total de plantas: %d\n", pagina, total);
+        printf("Pagina %d esta fora do intervalo. Total de plantas: %d\n", pagina, total);
         free(plantas);
         return;
     }
     if (fim > total) fim = total;
 
-    printf("Página %d — nomes usuais das plantas:\n", pagina);
+    printf("Pagina %d — nomes usuais das plantas:\n", pagina);
     for (int i = inicio; i < fim; i++) {
         printf("• %s\n", plantas[i].nome_popular);
     }
@@ -221,20 +221,20 @@ void exibir_nomes_cientificos(int pagina) {
     }
     fclose(fp);
 
-    // Ordena por nome científico
+    // Ordena por nome cientifico
     qsort(plantas, total, sizeof(planta_t), comparar_nome_cientifico);
 
-    // Paginação: TAM_PAGINA por página
+    // Paginacao: TAM_PAGINA por pagina
     int inicio = pagina * TAM_PAGINA;
     int fim = inicio + TAM_PAGINA;
     if (inicio >= total) {
-        printf("Página %d está fora do intervalo. Total de plantas: %d\n", pagina, total);
+        printf("Pagina %d esta fora do intervalo. Total de plantas: %d\n", pagina, total);
         free(plantas);
         return;
     }
     if (fim > total) fim = total;
 
-    printf("Página %d — nomes científicos das plantas:\n", pagina);
+    printf("Pagina %d — nomes cientificos das plantas:\n", pagina);
     for (int i = inicio; i < fim; i++) {
         printf("• %s\n", plantas[i].nome_cientifico);
     }
@@ -249,10 +249,10 @@ int apagar_planta(const char* entidade, __int64 *raiz_offset, int id_alvo) {
         return -1;
     }
 
-    // Busca offset da planta pelo índice
+    // Busca offset da planta pelo indice
     __int64 offset = buscar_bplus(entidade, *raiz_offset, id_alvo);
     if (offset < 0) {
-        printf("Planta com ID %d não encontrada ou offset inválido.\n", id_alvo);
+        printf("Planta com ID %d nao encontrada ou offset invalido.\n", id_alvo);
         fclose(fp);
         return -1;
     }
@@ -270,10 +270,10 @@ int apagar_planta(const char* entidade, __int64 *raiz_offset, int id_alvo) {
         return -1;
     }
 
-    // Remove do índice
+    // Remove do indice
     __int64 novo_raiz = remover_bplus(entidade, *raiz_offset, id_alvo);
     if (novo_raiz < -1) {
-        printf("Erro ao remover do índice.\n");
+        printf("Erro ao remover do indice.\n");
         fclose(fp);
         return -1;
     }
@@ -281,7 +281,7 @@ int apagar_planta(const char* entidade, __int64 *raiz_offset, int id_alvo) {
     salvar_raiz(*raiz_offset, entidade);
 
     if (*raiz_offset == -1) {
-        printf("Arquivo e índice de plantas agora estão vazios.\n");
+        printf("Arquivo e indice de plantas agora estao vazios.\n");
     } else {
         printf("Planta removida com sucesso.\n");
     }
@@ -306,7 +306,7 @@ void buscar_planta(FILE *fp_bplus, __int64 raiz_offset, int id_alvo) {
 
     __int64 offset = buscar_bplus("plantas", raiz_offset, id_alvo);
     if (offset == -1 || offset < 0) {
-        printf("Planta com ID %d não encontrada.\n", id_alvo);
+        printf("Planta com ID %d nao encontrada.\n", id_alvo);
         fclose(fp);
         return;
     }
@@ -327,11 +327,11 @@ void buscar_planta(FILE *fp_bplus, __int64 raiz_offset, int id_alvo) {
 
     printf("\n--- Planta encontrada ---\n");
     printf("ID: %d\n", p.id_planta);
-    printf("Nome Científico: %s\n", p.nome_cientifico);
+    printf("Nome Cientifico: %s\n", p.nome_cientifico);
     printf("Nome Popular: %s\n", p.nome_popular);
     printf("Tipo: %s\n", p.tipo);
-    printf("Status de Conservação: %s\n", p.status_conservacao);
-    printf("Descrição: %s\n", p.descricao);
+    printf("Status de Conservacao: %s\n", p.status_conservacao);
+    printf("Descricao: %s\n", p.descricao);
     printf("Data de Registro: %s\n", p.data_registro);
     printf("------------------------\n");
 
@@ -367,13 +367,13 @@ void exibir_por_data(int pagina) {
     int inicio = pagina * TAM_PAGINA;
     int fim = inicio + TAM_PAGINA;
     if (inicio >= total) {
-        printf("Página %d está fora do intervalo. Total de plantas: %d\n", pagina, total);
+        printf("Pagina %d esta fora do intervalo. Total de plantas: %d\n", pagina, total);
         free(plantas);
         return;
     }
     if (fim > total) fim = total;
 
-    printf("Página %d — plantas ordenadas por data de registro:\n", pagina);
+    printf("Pagina %d — plantas ordenadas por data de registro:\n", pagina);
     for (int i = inicio; i < fim; i++) {
         printf("• %s — %s\n", plantas[i].nome_popular, plantas[i].data_registro);
     }
@@ -412,12 +412,12 @@ void navegar_nomes_populares() {
         }
         if (fim > total) fim = total;
 
-        printf("\nPágina %d:\n", pagina);
+        printf("\nPagina %d:\n", pagina);
         for (int i = inicio; i < fim; i++) {
             printf("- %s\n", plantas[i].nome_popular);
         }
 
-        printf("\n[Enter] próxima | [número] ir para página | [s] sair: ");
+        printf("\n[Enter] próxima | [número] ir para pagina | [s] sair: ");
         fgets(entrada, sizeof(entrada), stdin);
         entrada[strcspn(entrada, "\n")] = '\0'; // remove '\n'
 
@@ -430,7 +430,7 @@ void navegar_nomes_populares() {
             if (nova_pagina >= 0 && nova_pagina * TAM_PAGINA < total) {
                 pagina = nova_pagina;
             } else {
-                printf("Página inválida.\n");
+                printf("Pagina invalida.\n");
             }
         }
     }
@@ -499,21 +499,21 @@ void navegar_por_nome_popular_indexado() {
         }
         if (fim > total) fim = total;
 
-        printf("\n Página %d:\n", pagina);
+        printf("\n Pagina %d:\n", pagina);
         for (int i = inicio; i < fim; i++) {
             fseek(fp_data, indices[i].offset, SEEK_SET);
             fread(&planta, sizeof(planta_t), 1, fp_data);
 
             printf("\n%s\n", planta.nome_popular);
             printf("ID: %05d\n", planta.id_planta);
-            printf("Nome científico: %s\n", planta.nome_cientifico);
+            printf("Nome cientifico: %s\n", planta.nome_cientifico);
             printf("Tipo: %s\n", planta.tipo);
-            printf("Status de conservação: %s\n", planta.status_conservacao);
-            printf("Descrição: %s\n", planta.descricao);
+            printf("Status de conservacao: %s\n", planta.status_conservacao);
+            printf("Descricao: %s\n", planta.descricao);
             printf("Data de registro: %s\n", planta.data_registro);
         }
 
-        printf("\n[Enter] próxima | [número] ir para página | [s] sair: ");
+        printf("\n[Enter] próxima | [número] ir para pagina | [s] sair: ");
         fgets(entrada, sizeof(entrada), stdin);
         entrada[strcspn(entrada, "\n")] = '\0';
 
@@ -526,7 +526,7 @@ void navegar_por_nome_popular_indexado() {
             if (nova_pagina >= 0 && nova_pagina * TAM_PAGINA < total) {
                 pagina = nova_pagina;
             } else {
-                printf("Página inválida.\n");
+                printf("Pagina invalida.\n");
             }
         }
     }

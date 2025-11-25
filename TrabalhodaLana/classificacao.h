@@ -9,7 +9,7 @@
 
 
 typedef struct {
-    int id_classificacao;       // Identificador �nico da classifica��o
+    int id_classificacao;       // Identificador anico da classificaaao
     char reino[30];             // Ex: Plantae
     char filo[30];              // Ex: Magnoliophyta
     char classe[30];            // Ex: Magnoliopsida

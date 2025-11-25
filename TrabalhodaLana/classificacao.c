@@ -14,13 +14,13 @@ __int64 salvar_classificacao(const classificacao_t *c) {
     __int64 offset = FTELL(fp);
 
     if (fwrite(c, sizeof(classificacao_t), 1, fp) != 1) {
-        perror("Erro ao salvar classifica��o");
+        perror("Erro ao salvar classificaCAo");
         fclose(fp);
         return -1;
     }
 
     fclose(fp);
-    printf("Classifica��o salva com sucesso (ID %d, offset %" PRId64 ").\n",
+    printf("Classificacao salva com sucesso (ID %d, offset %" PRId64 ").\n",
            c->id_classificacao, offset);
     return offset;
 }
@@ -35,24 +35,24 @@ void listar_classificacoes() {
     classificacao_t c;
     int count = 0;
 
-    printf("\n--- Lista de Classifica��es Bot�nicas ---\n");
+    printf("\n--- Lista de Classificacoes Botanicas ---\n");
 
     while (fread(&c, sizeof(classificacao_t), 1, fp) == 1) {
         if (c.id_classificacao == -1) continue; // ignorar apagados
 
-        printf("\n===== Classifica��o %d =====\n", c.id_classificacao);
+        printf("\n===== Classificacao %d =====\n", c.id_classificacao);
         printf("Reino: %s\n", c.reino);
         printf("Filo: %s\n", c.filo);
         printf("Classe: %s\n", c.classe);
         printf("Ordem: %s\n", c.ordem);
-        printf("Fam�lia: %s\n", c.familia);
-        printf("G�nero: %s\n", c.genero);
+        printf("Familia: %s\n", c.familia);
+        printf("Genero: %s\n", c.genero);
         printf("ID Planta: %d\n", c.id_planta);
         count++;
     }
 
     fclose(fp);
-    printf("\nTotal de classifica��es exibidas: %d\n", count);
+    printf("\nTotal de classificacoes exibidas: %d\n", count);
 }
 
 int apagar_classificacao(int id_alvo) {
@@ -71,13 +71,13 @@ int apagar_classificacao(int id_alvo) {
             FSEEK(fp, offset, SEEK_SET);
             fwrite(&c, sizeof(classificacao_t), 1, fp);
             fclose(fp);
-            printf("Classifica��o %d apagada com sucesso.\n", id_alvo);
+            printf("Classificacao %d apagada com sucesso.\n", id_alvo);
             return 0;
         }
         offset += sizeof(classificacao_t);
     }
 
     fclose(fp);
-    printf("Classifica��o com ID %d n�o encontrada.\n", id_alvo);
+    printf("Classificacao com ID %d nao encontrada.\n", id_alvo);
     return -1;
 }

@@ -14,44 +14,44 @@
 
 #define ORDEM 4
 
-// Estrutura de n� da �rvore B+
+// Estrutura de na da arvore B+
 typedef struct {
-    int eh_folha;             // 1 se for folha, 0 se for n� interno
-    int num_chaves;           // n�mero atual de chaves no n�
+    int eh_folha;             // 1 se for folha, 0 se for na interno
+    int num_chaves;           // namero atual de chaves no na
     int chaves[ORDEM];        // vetor de chaves
-    __int64 offsets[ORDEM];   // offsets no arquivo plantas.dat (v�lido s� em folhas)
-    __int64 filhos[ORDEM+1];  // offsets dos filhos (v�lido s� em n�s internos)
+    __int64 offsets[ORDEM];   // offsets no arquivo plantas.dat (valido sa em folhas)
+    __int64 filhos[ORDEM+1];  // offsets dos filhos (valido sa em nas internos)
     __int64 proximo;          // usado em folhas para encadear
 } bplus_no_t;
 
-/* ========= OPERA��ES DE ALTO N�VEL ========= */
+/* ========= OPERAaaES DE ALTO NaVEL ========= */
 
-// Inser��o
+// Inseraao
 int inserir_bplus(const char* entidade, __int64* raiz_offset, int id, __int64 dado_offset);
 __int64 salvar_na_arvore_bplus(const char* entidade, int id, __int64 offset, __int64 raiz_offset);
 
-// Remo��o
+// Remoaao
 __int64 remover_bplus(const char* entidade, __int64 raiz_offset, int id);
 
 // Busca
 __int64 buscar_bplus(const char* entidade, __int64 raiz_offset, int id);
 
-// Impress�o e navega��o
+// Impressao e navegaaao
 void imprimir_bplus(const char* entidade, __int64 raiz_offset, int nivel);
 void listar_bplus_pagina(const char* entidade, __int64 raiz_offset, int tamanho_pagina, int pagina_desejada);
 void listar_bplus_pagina_total(const char* entidade, __int64 raiz_offset, int tamanho_pagina, int pagina_desejada);
 
-// Estat�sticas
+// Estatasticas
 int contar_registros_bplus(const char* entidade, __int64 raiz_offset);
 
-/* ========= UTILIT�RIOS DE N� ========= */
+/* ========= UTILITaRIOS DE Na ========= */
 
 int carregar_no(const char* entidade, __int64 offset, bplus_no_t *no_out);
 int salvar_no(const char* entidade, __int64 offset, const bplus_no_t *no);
 __int64 criar_no_folha(const char* entidade);
 __int64 criar_no_interno(const char* entidade);
 
-/* ========= PERSIST�NCIA ========= */
+/* ========= PERSISTaNCIA ========= */
 
 FILE* fp_bplus(const char* entidade);
 void salvar_raiz(__int64 raiz_offset, const char* entidade);

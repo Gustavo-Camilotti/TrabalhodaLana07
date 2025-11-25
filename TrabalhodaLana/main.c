@@ -2,72 +2,93 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
+#include <locale.h>
+
+// Módulos do projeto
+#include "bplus.h"
 #include "plantas.h"
 #include "ocorrencias.h"
-#include "bplus.h"
+#include "bioma.h"
+#include "classificacao.h"
+#include "distribuicao.h"
 #include "inv_bioma.h"
-
 
 // Função auxiliar para ler string com segurança
 void ler_string(char *dest, int tamanho) {
-    if (dest == NULL || tamanho <= 0) return;
 
-    // Lê a linha do stdin
+
+    
+    if (dest == NULL || tamanho <= 0) return;
     if (fgets(dest, tamanho, stdin) != NULL) {
-        // Remove o '\n' caso tenha sido lido
         dest[strcspn(dest, "\n")] = '\0';
     } else {
-        // Em caso de erro, garante string vazia
         dest[0] = '\0';
     }
 }
 
 int main() {
     setlocale(LC_ALL, "Portuguese");
-    // Índice de plantas
-    FILE *fp_idx_plantas = fp_bplus("plantas");
-    __int64 raiz_offset_plantas = carregar_raiz("plantas");
 
-    // Índice de ocorrências
-    FILE *fp_idx_ocorrencias = fp_bplus("ocorrencias");
+    // Inicializa as raízes dos índices B+ (Carrega da memória se existir)
+    __int64 raiz_offset_plantas = carregar_raiz("plantas");
     __int64 raiz_offset_ocorrencias = carregar_raiz("ocorrencias");
+
+    // CORREÇÃO DE SEGURANÇA: Abre e fecha apenas para garantir que os arquivos existem
+    // Isso evita travar o arquivo no Windows durante a execução
+    FILE *fp_check = fp_bplus("plantas"); if (fp_check) fclose(fp_check);
+    fp_check = fp_bplus("ocorrencias"); if (fp_check) fclose(fp_check);
 
     int opcao;
     do {
         printf("\n===== MENU PRINCIPAL =====\n");
+        printf("--- PLANTAS ---\n");
         printf("1. Adicionar planta\n");
         printf("2. Listar plantas\n");
         printf("3. Editar planta\n");
         printf("4. Apagar planta\n");
-        printf("5. Adicionar ocorrência\n");
-        printf("6. Listar ocorrências\n");
-        printf("7. Editar ocorrência\n");
-        printf("8. Apagar ocorrência\n");
-        printf("9. Vincular Planta a Bioma (Indice Invertido)\n");
-        printf("10. Buscar Plantas por Bioma\n");
-
+        printf("--- OCORRENCIAS ---\n");
+        printf("5. Adicionar ocorrencia\n");
+        printf("6. Listar ocorrencias\n");
+        printf("7. Editar ocorrencia\n");
+        printf("8. Apagar ocorrencia\n");
+        printf("--- OUTROS CADASTROS ---\n");
+        printf("11. Adicionar Bioma\n");
+        printf("12. Listar Biomas\n");
+        printf("13. Apagar Bioma\n");
+        printf("14. Adicionar Classificacao\n");
+        printf("15. Listar Classificacoes\n");
+        printf("16. Apagar Classificacao\n");
+        printf("17. Adicionar Distribuicao (Geografica)\n");
+        printf("18. Listar Distribuicoes\n");
+        printf("19. Apagar Distribuicao\n");
+        printf("--- BUSCAS ESPECIAIS ---\n");
+        printf("9. Vincular Planta a Bioma (Manual)\n");
+        printf("10. Buscar Plantas por Bioma (Indice Invertido)\n");
         printf("0. Sair\n");
-        printf("Escolha uma opção: ");
-        scanf("%d", &opcao);
+        printf("Escolha uma opcao: ");
+        
+        // Tratamento para entrada inválida (letras no lugar de números)
+        if (scanf("%d", &opcao) != 1) {
+            while(getchar() != '\n'); 
+            opcao = -1;
+        }
         getchar(); // consome \n
 
         switch (opcao) {
-           case 1: {
+            case 1: {
                 planta_t p;
                 int id_temp;
-                
                 printf("\n--- Cadastro de Planta ---\n");
                 printf("Digite o ID da planta: ");
                 scanf("%d", &id_temp);
-                getchar(); // consome \n
+                getchar();
 
-                // BLINDAGEM: Verifica se o ID já existe na árvore B+ de plantas
+                // Verifica duplicidade
                 if (buscar_bplus("plantas", raiz_offset_plantas, id_temp) != -1) {
                     printf("\n[ERRO] O ID %d ja existe cadastrado! Tente outro.\n", id_temp);
-                    break; // Sai do case e volta para o menu
+                    break;
                 }
-
-                // Se chegou aqui, o ID é válido
                 p.id_planta = id_temp;
 
                 printf("Nome cientifico: ");
@@ -86,26 +107,21 @@ int main() {
                 __int64 offset = salvar_planta(&p);
                 if (offset != -1) {
                     printf("Planta salva com sucesso no offset %" PRId64 "\n", offset);
-                    // Recarrega a raiz pois a inserção pode ter alterado a árvore (split)
                     raiz_offset_plantas = carregar_raiz("plantas");
                 }
                 break;
             }
-
             case 2:
                 listar_plantas("plantas", raiz_offset_plantas);
                 break;
-
             case 3: {
                 int id;
                 printf("Digite o ID da planta que deseja editar: ");
                 scanf("%d", &id);
-
                 getchar();
                 editar_planta("plantas", raiz_offset_plantas, id);
                 break;
             }
-
             case 4: {
                 int id;
                 printf("Digite o ID da planta que deseja apagar: ");
@@ -114,43 +130,31 @@ int main() {
                 apagar_planta("plantas", &raiz_offset_plantas, id);
                 break;
             }
-
             case 5: {
                 ocorrencia_t oc;
                 char buffer[32];
                 int id_temp;
-
                 printf("\n--- Cadastro de Ocorrencia ---\n");
                 printf("Digite o ID da ocorrencia: ");
                 ler_string(buffer, sizeof(buffer));
                 id_temp = atoi(buffer);
 
-                // BLINDAGEM: Verifica se o ID já existe na árvore B+ de ocorrências
                 if (buscar_bplus("ocorrencias", raiz_offset_ocorrencias, id_temp) != -1) {
                     printf("\n[ERRO] O ID %d ja existe para outra ocorrencia! Tente outro.\n", id_temp);
-                    break; // Sai do case e volta para o menu
+                    break;
                 }
-
                 oc.id_ocorrencia = id_temp;
 
                 printf("Data da ocorrencia (AAAA-MM-DD): ");
                 ler_string(oc.data_ocorrencia, sizeof(oc.data_ocorrencia));
-
                 printf("Fonte dos dados: ");
                 ler_string(oc.fonte_dados, sizeof(oc.fonte_dados));
-
                 printf("Observador: ");
                 ler_string(oc.observador, sizeof(oc.observador));
-
+                
                 printf("ID da planta associada: ");
                 ler_string(buffer, sizeof(buffer));
-                int id_planta_assoc = atoi(buffer);
-
-                // VERIFICAÇÃO EXTRA (Opcional mas recomendada): A planta existe?
-                if (buscar_bplus("plantas", raiz_offset_plantas, id_planta_assoc) == -1) {
-                    printf("\n[AVISO] Nenhuma planta encontrada com ID %d. Cadastrando mesmo assim (sem vinculo valido).\n", id_planta_assoc);
-                }
-                oc.id_planta = id_planta_assoc;
+                oc.id_planta = atoi(buffer);
 
                 __int64 offset = salvar_ocorrencia(&oc);
                 if (offset != -1) {
@@ -159,23 +163,20 @@ int main() {
                 }
                 break;
             }
-
             case 6:
                 listar_ocorrencias(raiz_offset_ocorrencias);
                 break;
-
             case 7: {
                 int id;
-                printf("Digite o ID da ocorrência que deseja editar: ");
+                printf("Digite o ID da ocorrencia que deseja editar: ");
                 scanf("%d", &id);
                 getchar();
                 editar_ocorrencia(raiz_offset_ocorrencias, id);
                 break;
             }
-
             case 8: {
                 int id;
-                printf("Digite o ID da ocorrência que deseja apagar: ");
+                printf("Digite o ID da ocorrencia que deseja apagar: ");
                 scanf("%d", &id);
                 getchar();
                 apagar_ocorrencia(&raiz_offset_ocorrencias, id);
@@ -183,21 +184,16 @@ int main() {
             }
             case 9: {
                 int id_planta, id_bioma;
-                printf("\n--- Vincular Planta a Bioma ---\n");
-                
+                printf("\n--- Vincular Planta a Bioma (Manual) ---\n");
                 printf("Digite o ID da Planta existente: ");
                 scanf("%d", &id_planta);
-                
-                // Verifica se a planta existe antes de vincular
                 if (buscar_bplus("plantas", raiz_offset_plantas, id_planta) == -1) {
                     printf("[ERRO] Planta nao encontrada! Cadastre a planta primeiro.\n");
                     break;
                 }
-
-                printf("Digite o ID do Bioma (ex: 1=Cerrado, 2=Amazonia): ");
+                printf("Digite o ID do Bioma: ");
                 scanf("%d", &id_bioma);
                 getchar();
-
                 if (adicionar_indice_bioma(id_bioma, id_planta)) {
                     printf("Vinculo criado com sucesso! (Bioma %d -> Planta %d)\n", id_bioma, id_planta);
                 } else {
@@ -205,31 +201,74 @@ int main() {
                 }
                 break;
             }
-
             case 10: {
                 int id_bioma;
                 printf("\n--- Buscar Plantas por Bioma ---\n");
                 printf("Digite o ID do Bioma para pesquisar: ");
                 scanf("%d", &id_bioma);
                 getchar();
-
-                // Chama a função do arquivo inv_bioma.c
                 buscar_plantas_por_bioma(id_bioma);
                 break;
             }
-
-            case 0:
-                printf("Encerrando programa...\n");
+            case 11: {
+                bioma_t b;
+                printf("\n--- Cadastro de Bioma ---\n");
+                printf("ID do Bioma: ");
+                scanf("%d", &b.id_bioma); getchar();
+                printf("Nome do Bioma: "); ler_string(b.nome_bioma, sizeof(b.nome_bioma));
+                printf("Tipo de Vegetacao: "); ler_string(b.tipo_vegetacao, sizeof(b.tipo_vegetacao));
+                printf("Clima: "); ler_string(b.clima, sizeof(b.clima));
+                printf("Descricao: "); ler_string(b.descricao, sizeof(b.descricao));
+                salvar_bioma(&b);
                 break;
-
-            default:
-                printf("Opção inválida. Tente novamente.\n");
+            }
+            case 12: listar_biomas(); break;
+            case 13: {
+                int id; printf("ID do Bioma para apagar: "); scanf("%d", &id); getchar();
+                apagar_bioma(id); break;
+            }
+            case 14: {
+                classificacao_t c;
+                printf("\n--- Cadastro de Classificacao ---\n");
+                printf("ID da Classificacao: "); scanf("%d", &c.id_classificacao); getchar();
+                printf("Reino: "); ler_string(c.reino, sizeof(c.reino));
+                printf("Filo: "); ler_string(c.filo, sizeof(c.filo));
+                printf("Classe: "); ler_string(c.classe, sizeof(c.classe));
+                printf("Ordem: "); ler_string(c.ordem, sizeof(c.ordem));
+                printf("Familia: "); ler_string(c.familia, sizeof(c.familia));
+                printf("Genero: "); ler_string(c.genero, sizeof(c.genero));
+                printf("ID da Planta Associada: "); scanf("%d", &c.id_planta); getchar();
+                salvar_classificacao(&c);
                 break;
+            }
+            case 15: listar_classificacoes(); break;
+            case 16: {
+                int id; printf("ID da Classificacao para apagar: "); scanf("%d", &id); getchar();
+                apagar_classificacao(id); break;
+            }
+            case 17: {
+                distribuicao_t d;
+                printf("\n--- Cadastro de Distribuicao Geografica ---\n");
+                printf("ID da Distribuicao: "); scanf("%d", &d.id_distribuicao); getchar();
+                printf("Continente: "); ler_string(d.continente, sizeof(d.continente));
+                printf("Pais: "); ler_string(d.pais, sizeof(d.pais));
+                printf("ID do Bioma: "); scanf("%d", &d.id_bioma);
+                printf("ID da Planta: "); scanf("%d", &d.id_planta); getchar();
+                salvar_distribuicao(&d);
+                // Automacao do Índice Invertido
+                adicionar_indice_bioma(d.id_bioma, d.id_planta);
+                printf("[SISTEMA] Indice invertido atualizado (Bioma %d -> Planta %d).\n", d.id_bioma, d.id_planta);
+                break;
+            }
+            case 18: listar_distribuicoes(); break;
+            case 19: {
+                int id; printf("ID da Distribuicao para apagar: "); scanf("%d", &id); getchar();
+                apagar_distribuicao(id); break;
+            }
+            case 0: printf("Encerrando programa...\n"); break;
+            default: printf("Opcao invalida. Tente novamente.\n"); break;
         }
-
     } while (opcao != 0);
 
-    fclose(fp_idx_plantas);
-    fclose(fp_idx_ocorrencias);
     return 0;
 }

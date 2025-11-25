@@ -8,11 +8,11 @@
 #include "bplus.h"
 
 typedef struct {
-    int id_bioma;                // Identificador �nico do bioma
-    char nome_bioma[50];        // Nome do bioma (ex: Amaz�nia, Cerrado)
-    char tipo_vegetacao[50];    // Tipo predominante de vegeta��o (ex: Floresta, Savana)
+    int id_bioma;                // Identificador unico do bioma
+    char nome_bioma[50];        // Nome do bioma (ex: Amazonia, Cerrado)
+    char tipo_vegetacao[50];    // Tipo predominante de vegetacao (ex: Floresta, Savana)
     char clima[30];             // Clima predominante (ex: Equatorial, Tropical)
-    char descricao[200];        // Descri��o geral do bioma
+    char descricao[200];        // Descricao geral do bioma
 } bioma_t;
 
 __int64 salvar_bioma(const bioma_t *b);

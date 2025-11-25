@@ -16,18 +16,18 @@ __int64 salvar_ocorrencia(const ocorrencia_t *oc) {
     __int64 offset = FTELL(fp_dados);
 
     if (fwrite(oc, sizeof(ocorrencia_t), 1, fp_dados) != 1) {
-        perror("Erro ao salvar ocorr�ncia");
+        perror("Erro ao salvar ocorrencia");
         fclose(fp_dados);
         return -1;
     }
     fclose(fp_dados);
 
-    // Atualiza �ndice B+ de ocorr�ncias
+    // Atualiza andice B+ de ocorrencias
     __int64 raiz_offset = carregar_raiz("ocorrencias");
     raiz_offset = salvar_na_arvore_bplus("ocorrencias", oc->id_ocorrencia, offset, raiz_offset);
     salvar_raiz(raiz_offset, "ocorrencias");
 
-    printf("Ocorr�ncia salva com sucesso (ID %d, offset %" PRId64 ").\n",
+    printf("Ocorrencia salva com sucesso (ID %d, offset %" PRId64 ").\n",
            oc->id_ocorrencia, offset);
 
     return offset;
@@ -35,17 +35,17 @@ __int64 salvar_ocorrencia(const ocorrencia_t *oc) {
 
 void listar_ocorrencias(__int64 raiz_offset) {
     if (raiz_offset == -1) {
-        printf("Nenhuma ocorr�ncia cadastrada.\n");
+        printf("Nenhuma ocorrencia cadastrada.\n");
         return;
     }
 
     bplus_no_t no;
     __int64 offset = raiz_offset;
 
-    // Vai at� a folha mais � esquerda
+    // Vai ata a folha mais a esquerda
     while (1) {
         if (!carregar_no("ocorrencias", offset, &no)) {
-            printf("Erro ao carregar n�.\n");
+            printf("Erro ao carregar no.\n");
             return;
         }
         if (no.eh_folha) break;
@@ -62,17 +62,17 @@ void listar_ocorrencias(__int64 raiz_offset) {
     int pagina = 1;
     char comando[8];
 
-    printf("\n--- Lista de Ocorr�ncias (ordenadas por ID) ---\n");
+    printf("\n--- Lista de ocorrencias (ordenadas por ID) ---\n");
 
     // Percorre folhas encadeadas
     while (offset != -1) {
         if (!carregar_no("ocorrencias", offset, &no)) {
-            printf("Erro ao carregar n�.\n");
+            printf("Erro ao carregar no.\n");
             break;
         }
 
         for (int i = 0; i < no.num_chaves; i++) {
-            if (no.offsets[i] < 0) continue; // prote��o
+            if (no.offsets[i] < 0) continue; // proteaao
 
             ocorrencia_t oc;
             if (FSEEK(fp_dados, no.offsets[i], SEEK_SET) != 0) continue;
@@ -81,7 +81,7 @@ void listar_ocorrencias(__int64 raiz_offset) {
             // Ignora registros apagados
             if (oc.id_ocorrencia == -1) continue;
 
-            printf("\n===== Ocorr�ncia %d =====\n", oc.id_ocorrencia);
+            printf("\n===== ocorrencia %d =====\n", oc.id_ocorrencia);
             printf("Data: %s\n", oc.data_ocorrencia);
             printf("Fonte: %s\n", oc.fonte_dados);
             printf("Observador: %s\n", oc.observador);
@@ -89,9 +89,9 @@ void listar_ocorrencias(__int64 raiz_offset) {
 
             exibidos++;
 
-            // Controle de pagina��o
+            // Controle de paginaaao
             if (exibidos % OCORRENCIAS_POR_PAGINA == 0) {
-                printf("---- P�gina %d conclu�da ----\n", pagina);
+                printf("---- Pagina %d concluida ----\n", pagina);
                 printf("Pressione ENTER para continuar ou Q para sair...\n");
 
                 fgets(comando, sizeof(comando), stdin);
@@ -104,7 +104,7 @@ void listar_ocorrencias(__int64 raiz_offset) {
             }
         }
 
-        offset = no.proximo; // vai para pr�xima folha
+        offset = no.proximo; // vai para praxima folha
     }
 
     fclose(fp_dados);
@@ -119,10 +119,10 @@ int apagar_ocorrencia(__int64 *raiz_offset, int id_alvo) {
         return -1;
     }
 
-    // Busca no �ndice
+    // Busca no andice
     __int64 offset = buscar_bplus("ocorrencias", *raiz_offset, id_alvo);
     if (offset == -1) {
-        printf("Ocorr�ncia com ID %d n�o encontrada.\n", id_alvo);
+        printf("ocorrencia com ID %d nao encontrada.\n", id_alvo);
         fclose(fp);
         return -1;
     }
@@ -135,19 +135,19 @@ int apagar_ocorrencia(__int64 *raiz_offset, int id_alvo) {
     oc.id_ocorrencia = -1;
     if (FSEEK(fp, offset, SEEK_SET) != 0) { fclose(fp); return -1; }
     if (fwrite(&oc, sizeof(ocorrencia_t), 1, fp) != 1) {
-        perror("Erro ao atualizar ocorr�ncia");
+        perror("Erro ao atualizar ocorrencia");
         fclose(fp);
         return -1;
     }
 
-    // Remove do �ndice
+    // Remove do andice
     *raiz_offset = remover_bplus("ocorrencias", *raiz_offset, id_alvo);
     salvar_raiz(*raiz_offset, "ocorrencias");
 
     if (*raiz_offset == -1) {
-        printf("Arquivo e �ndice de ocorr�ncias agora est�o vazios.\n");
+        printf("Arquivo e indice de ocorrencias agora estao vazios.\n");
     } else {
-        printf("Ocorr�ncia removida com sucesso.\n");
+        printf("ocorrencia removida com sucesso.\n");
     }
 
     fclose(fp);
@@ -162,10 +162,10 @@ void editar_ocorrencia(__int64 raiz_offset, int id_alvo) {
         return;
     }
 
-    // Busca offset da ocorr�ncia pelo �ndice de ocorr�ncias
+    // Busca offset da ocorrencia pelo andice de ocorrencias
     __int64 offset = buscar_bplus("ocorrencias", raiz_offset, id_alvo);
     if (offset == -1) {
-        printf("Ocorr�ncia com ID %d n�o encontrada.\n", id_alvo);
+        printf("ocorrencia com ID %d nao encontrada.\n", id_alvo);
         fclose(fp);
         return;
     }
@@ -174,18 +174,18 @@ void editar_ocorrencia(__int64 raiz_offset, int id_alvo) {
     if (FSEEK(fp, offset, SEEK_SET) != 0) { fclose(fp); return; }
     if (fread(&oc, sizeof(ocorrencia_t), 1, fp) != 1) { fclose(fp); return; }
 
-    printf("\n--- Ocorr�ncia encontrada ---\n");
+    printf("\n--- ocorrencia encontrada ---\n");
 
-    editar_campo_string("Data da Ocorr�ncia (AAAA-MM-DD)", oc.data_ocorrencia, sizeof(oc.data_ocorrencia));
+    editar_campo_string("Data da ocorrencia (AAAA-MM-DD)", oc.data_ocorrencia, sizeof(oc.data_ocorrencia));
     editar_campo_string("Fonte dos Dados", oc.fonte_dados, sizeof(oc.fonte_dados));
     editar_campo_string("Observador", oc.observador, sizeof(oc.observador));
-    // Se quiser, pode tamb�m pedir novo ID da planta associada (int)
+    // Se quiser, pode tambam pedir novo ID da planta associada (int)
 
     if (FSEEK(fp, offset, SEEK_SET) != 0) { fclose(fp); return; }
     if (fwrite(&oc, sizeof(ocorrencia_t), 1, fp) != 1) {
-        perror("Erro ao atualizar ocorr�ncia");
+        perror("Erro ao atualizar ocorrencia");
     } else {
-        printf("Ocorr�ncia atualizada com sucesso.\n");
+        printf("ocorrencia atualizada com sucesso.\n");
     }
 
     fclose(fp);

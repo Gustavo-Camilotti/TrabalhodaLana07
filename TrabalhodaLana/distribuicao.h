@@ -1,5 +1,5 @@
-#ifndef CLASSIFICACAO_H
-#define CLASSIFICACAO_H
+#ifndef DISTRIBUICAO_H
+#define DISTRIBUICAO_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,9 +8,9 @@
 #include "bplus.h"
 
 typedef struct {
-    int id_distribuicao;         // Identificador �nico da distribui��o
+    int id_distribuicao;         // Identificador anico da distribuiaao
     char continente[30];         // Continente onde a planta ocorre
-    char pais[50];               // Pa�s onde a planta ocorre
+    char pais[50];               // Paas onde a planta ocorre
     int id_bioma;                // Chave estrangeira para o bioma
     int id_planta;               // Chave estrangeira para a planta
 } distribuicao_t;
