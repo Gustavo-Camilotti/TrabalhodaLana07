@@ -5,6 +5,8 @@
 #include "plantas.h"
 #include "ocorrencias.h"
 #include "bplus.h"
+#include "inv_bioma.h"
+
 
 // Função auxiliar para ler string com segurança
 void ler_string(char *dest, int tamanho) {
@@ -21,6 +23,7 @@ void ler_string(char *dest, int tamanho) {
 }
 
 int main() {
+    setlocale(LC_ALL, "Portuguese");
     // Índice de plantas
     FILE *fp_idx_plantas = fp_bplus("plantas");
     __int64 raiz_offset_plantas = carregar_raiz("plantas");
@@ -40,6 +43,9 @@ int main() {
         printf("6. Listar ocorrências\n");
         printf("7. Editar ocorrência\n");
         printf("8. Apagar ocorrência\n");
+        printf("9. Vincular Planta a Bioma (Indice Invertido)\n");
+        printf("10. Buscar Plantas por Bioma\n");
+
         printf("0. Sair\n");
         printf("Escolha uma opção: ");
         scanf("%d", &opcao);
@@ -173,6 +179,42 @@ int main() {
                 scanf("%d", &id);
                 getchar();
                 apagar_ocorrencia(&raiz_offset_ocorrencias, id);
+                break;
+            }
+            case 9: {
+                int id_planta, id_bioma;
+                printf("\n--- Vincular Planta a Bioma ---\n");
+                
+                printf("Digite o ID da Planta existente: ");
+                scanf("%d", &id_planta);
+                
+                // Verifica se a planta existe antes de vincular
+                if (buscar_bplus("plantas", raiz_offset_plantas, id_planta) == -1) {
+                    printf("[ERRO] Planta nao encontrada! Cadastre a planta primeiro.\n");
+                    break;
+                }
+
+                printf("Digite o ID do Bioma (ex: 1=Cerrado, 2=Amazonia): ");
+                scanf("%d", &id_bioma);
+                getchar();
+
+                if (adicionar_indice_bioma(id_bioma, id_planta)) {
+                    printf("Vinculo criado com sucesso! (Bioma %d -> Planta %d)\n", id_bioma, id_planta);
+                } else {
+                    printf("Erro ao salvar vinculo.\n");
+                }
+                break;
+            }
+
+            case 10: {
+                int id_bioma;
+                printf("\n--- Buscar Plantas por Bioma ---\n");
+                printf("Digite o ID do Bioma para pesquisar: ");
+                scanf("%d", &id_bioma);
+                getchar();
+
+                // Chama a função do arquivo inv_bioma.c
+                buscar_plantas_por_bioma(id_bioma);
                 break;
             }
 
