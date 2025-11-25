@@ -1,0 +1,146 @@
+# depslib dependency file v1.0
+1763059278 source:c:\users\argonauta\desktop\arquivos c\trabalhodalana\bioma.c
+
+1763059268 source:c:\users\argonauta\desktop\arquivos c\trabalhodalana\classificacao.c
+
+1763059254 source:c:\users\argonauta\desktop\arquivos c\trabalhodalana\distribuicao.c
+
+1763060970 source:c:\users\argonauta\desktop\arquivos c\trabalhodalana\main.c
+	"plantas.h"
+
+1763051030 c:\users\argonauta\desktop\arquivos c\trabalhodalana\funcoes.h
+
+1763059242 source:c:\users\argonauta\desktop\arquivos c\trabalhodalana\ocorrencias.c
+
+1763060966 source:c:\users\argonauta\desktop\arquivos c\trabalhodalana\plantas.c
+	"plantas.h"
+
+1763060354 c:\users\argonauta\desktop\arquivos c\trabalhodalana\plantas.h
+	<stdlib.h>
+	<stdio.h>
+
+1763059278 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana\bioma.c
+
+1763059268 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana\classificacao.c
+
+1763059254 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana\distribuicao.c
+
+1763774860 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana\main.c
+	<stdio.h>
+	<string.h>
+	"plantas.h"
+
+1763931577 c:\users\argonauta\desktop\trabalholana\trabalhodalana\plantas.h
+	<stdlib.h>
+	<stdio.h>
+	"bplus.h"
+
+1763059242 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana\ocorrencias.c
+
+1763908145 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana\plantas.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"plantas.h"
+
+1763059278 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana03\trabalhodalana\bioma.c
+
+1763059268 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana03\trabalhodalana\classificacao.c
+
+1763059254 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana03\trabalhodalana\distribuicao.c
+
+1763059242 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana03\trabalhodalana\ocorrencias.c
+
+1763762841 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana03\trabalhodalana\plantas.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"plantas.h"
+
+1763762841 c:\users\argonauta\desktop\trabalholana\trabalhodalana03\trabalhodalana\plantas.h
+	<stdlib.h>
+	<stdio.h>
+	"bplus.h"
+
+1763746391 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana03\trabalhodalana\main.c
+	<stdio.h>
+	<string.h>
+	"plantas.h"
+
+1763762994 c:\users\argonauta\desktop\trabalholana\trabalhodalana03\trabalhodalana\bplus.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1763762957 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana03\trabalhodalana\bplus.c
+	"bplus.h"
+
+1763931553 c:\users\argonauta\desktop\trabalholana\trabalhodalana\bplus.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1763912725 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana\bplus.c
+	"bplus.h"
+
+1764040637 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana5.5\trabalhodalana\bioma.c
+	"bioma.h"
+
+1764040870 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana5.5\trabalhodalana\classificacao.c
+	"classificacao.h"
+
+1763059254 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana5.5\trabalhodalana\distribuicao.c
+
+1764039520 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana5.5\trabalhodalana\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"plantas.h"
+	"ocorrencias.h"
+	"bplus.h"
+
+1764028479 c:\users\argonauta\desktop\trabalholana\trabalhodalana5.5\trabalhodalana\plantas.h
+	<stdlib.h>
+	<stdio.h>
+	"bplus.h"
+
+1764037859 c:\users\argonauta\desktop\trabalholana\trabalhodalana5.5\trabalhodalana\bplus.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<inttypes.h>
+
+1764040034 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana5.5\trabalhodalana\ocorrencias.c
+	"ocorrencias.h"
+
+1764037843 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana5.5\trabalhodalana\bplus.c
+	"bplus.h"
+	<inttypes.h>
+
+1764037898 source:c:\users\argonauta\desktop\trabalholana\trabalhodalana5.5\trabalhodalana\plantas.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"plantas.h"
+
+1764027080 c:\users\argonauta\desktop\trabalholana\trabalhodalana5.5\trabalhodalana\ocorrencias.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<inttypes.h>
+	"bplus.h"
+
+1764040637 c:\users\argonauta\desktop\trabalholana\trabalhodalana5.5\trabalhodalana\bioma.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<inttypes.h>
+	"bplus.h"
+
+1764040890 c:\users\argonauta\desktop\trabalholana\trabalhodalana5.5\trabalhodalana\classificacao.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<inttypes.h>
+	"bplus.h"
+

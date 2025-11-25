@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="TrabalhodaLana" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/TrabalhodaLana" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/TrabalhodaLana" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="bioma.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bioma.h" />
+		<Unit filename="bplus.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bplus.h" />
+		<Unit filename="classificacao.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="classificacao.h" />
+		<Unit filename="distribuicao.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="distribuicao.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ocorrencias.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ocorrencias.h" />
+		<Unit filename="plantas.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="plantas.h" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
