@@ -16,7 +16,7 @@ Este projeto consiste em um sistema completo para catalogação de espécies de 
 
 ---
 
-## 🚀 Funcionalidades Implementadas
+## Funcionalidades Implementadas
 
 O sistema atende a todos os requisitos propostos, incluindo CRUD completo e múltiplos métodos de indexação:
 
