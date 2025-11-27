@@ -13,4 +13,5 @@ Abra o terminal na pasta do projeto e execute:
 ```bash
 cd TrabalhodaLana
 gcc main.c bplus.c plantas.c ocorrencias.c bioma.c distribuicao.c classificacao.c inv_bioma.c -o projeto_final.exe
+
 .\projeto_final.exe
