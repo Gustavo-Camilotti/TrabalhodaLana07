@@ -13,6 +13,7 @@
 #include "classificacao.h"
 #include "distribuicao.h"
 #include "inv_bioma.h"
+#include "trie.h"
 
 // Função auxiliar para ler string com segurança
 void ler_string(char *dest, int tamanho) {
@@ -33,7 +34,8 @@ int main() {
     // Inicializa as raízes dos índices B+ (Carrega da memória se existir)
     __int64 raiz_offset_plantas = carregar_raiz("plantas");
     __int64 raiz_offset_ocorrencias = carregar_raiz("ocorrencias");
-
+   //carrega a trie na memoria
+    TrieNo *raiz_nomes = carregar_trie_plantas();   
     // CORREÇÃO DE SEGURANÇA: Abre e fecha apenas para garantir que os arquivos existem
     // Isso evita travar o arquivo no Windows durante a execução
     FILE *fp_check = fp_bplus("plantas"); if (fp_check) fclose(fp_check);
@@ -65,6 +67,7 @@ int main() {
         printf("--- BUSCAS ESPECIAIS ---\n");
         printf("9. Vincular Planta a Bioma (Manual)\n");
         printf("10. Buscar Plantas por Bioma (Indice Invertido)\n");
+        printf("20. Buscar Planta por Nome (Trie)\n");
         printf("0. Sair\n");
         printf("Escolha uma opcao: ");
         
@@ -108,6 +111,10 @@ int main() {
                 if (offset != -1) {
                     printf("Planta salva com sucesso no offset %" PRId64 "\n", offset);
                     raiz_offset_plantas = carregar_raiz("plantas");
+                    // ATUALIZA A TRIE NA MEMÓRIA
+                    inserir_trie(raiz_nomes, p.nome_popular, offset);
+                    inserir_trie(raiz_nomes, p.nome_cientifico, offset);
+               
                 }
                 break;
             }
@@ -264,6 +271,33 @@ int main() {
             case 19: {
                 int id; printf("ID da Distribuicao para apagar: "); scanf("%d", &id); getchar();
                 apagar_distribuicao(id); break;
+            }
+            case 20: {
+                char termo[100];
+                printf("\n--- Busca por Nome (Popular ou Cientifico) ---\n");
+                printf("Digite o nome: ");
+                ler_string(termo, sizeof(termo));
+
+                long offset = buscar_trie(raiz_nomes, termo);
+                
+                if (offset != -1) {
+                    FILE *fp = fopen("data/plantas.dat", "rb");
+                    if (fp) {
+                        planta_t p;
+                        fseek(fp, offset, SEEK_SET);
+                        fread(&p, sizeof(planta_t), 1, fp);
+                        
+                        printf("\n--- Planta Encontrada ---\n");
+                        printf("ID: %d\n", p.id_planta);
+                        printf("Nome Popular: %s\n", p.nome_popular);
+                        printf("Nome Cientifico: %s\n", p.nome_cientifico);
+                        printf("Descricao: %s\n", p.descricao);
+                        fclose(fp);
+                    }
+                } else {
+                    printf("Nenhuma planta encontrada com o nome '%s'.\n", termo);
+                }
+                break;
             }
             case 0: printf("Encerrando programa...\n"); break;
             default: printf("Opcao invalida. Tente novamente.\n"); break;
