@@ -14,6 +14,7 @@
 #include "distribuicao.h"
 #include "inv_bioma.h"
 #include "trie.h"
+#include "importacao.h"
 
 // Função auxiliar para ler string com segurança
 void ler_string(char *dest, int tamanho) {
@@ -68,6 +69,8 @@ int main() {
         printf("9. Vincular Planta a Bioma (Manual)\n");
         printf("10. Buscar Plantas por Bioma (Indice Invertido)\n");
         printf("20. Buscar Planta por Nome (Trie)\n");
+        printf("21. Importar Plantas de CSV (Lote)\n");
+        printf("22. Importar Biomas de CSV (Lote)\n");
         printf("0. Sair\n");
         printf("Escolha uma opcao: ");
         
@@ -299,9 +302,50 @@ int main() {
                 }
                 break;
             }
-            case 0: printf("Encerrando programa...\n"); break;
+        case 21: {
+                char nome_arq[100];
+                printf("\n--- Importacao de Plantas (CSV) ---\n");
+                printf("Digite o nome do arquivo (ex: tabelaplanta.csv): ");
+                scanf("%s", nome_arq);
+                getchar(); // limpar buffer
+
+                importar_plantas_csv(nome_arq, raiz_nomes);
+                
+                // Atualiza a raiz da B+ no main
+                raiz_offset_plantas = carregar_raiz("plantas");
+                break;
+            }
+        case 22: {
+                char nome_arq[100];
+                printf("\n--- Importacao de Biomas (CSV) ---\n");
+                printf("Digite o nome do arquivo (ex: biomas.csv): ");
+                scanf("%s", nome_arq);
+                getchar();
+
+                importar_biomas_csv(nome_arq);
+                break;
+            }
+        case 0: printf("Encerrando programa...\n"); break;
             default: printf("Opcao invalida. Tente novamente.\n"); break;
         }
+    if (opcao != 0) {
+            printf("\n\n>>> Pressione ENTER para voltar ao menu... <<<");
+            
+            // O primeiro getchar pode consumir um \n sobrando, o segundo espera voce apertar
+            // Se o programa passar direto, adicione mais um getchar();
+            getchar(); 
+            
+            // Comando para limpar a tela
+            // No Windows usa "cls", no Linux usa "clear"
+            #ifdef _WIN32
+                system("cls");
+            #else
+                system("clear");
+            #endif
+        }
+
+
+
     } while (opcao != 0);
 
     return 0;

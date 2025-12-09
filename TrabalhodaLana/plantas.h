@@ -3,9 +3,9 @@
 #include "bplus.h"
 
 //#define ORDEM 4
-#define TAM_PAGINA 1
+#define TAM_PAGINA 6
 
-extern long raiz_offset; // vari�vel global
+extern long raiz_offset; // variavel global
 
 typedef struct {
     int id_planta;
@@ -19,10 +19,10 @@ typedef struct {
 
 typedef struct {
     char nome_popular[100];
-    long offset; // posi��o no plantas.dat
+    long offset; // posicao no plantas.dat
 } indice_nome_t;
 
-// Prot�tipos atualizados
+// Prototipos atualizados
 __int64 salvar_planta(const planta_t *planta);
 void listar_plantas(const char* entidade, __int64 raiz_offset);
 void editar_planta(const char* entidade, __int64 raiz_offset, int id_alvo);
