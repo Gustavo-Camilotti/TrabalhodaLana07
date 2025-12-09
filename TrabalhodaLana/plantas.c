@@ -4,7 +4,7 @@
 #include "plantas.h"
 
 //#define ORDEM 4
-
+//ERICK FRANCO
 __int64 salvar_planta(const planta_t *planta) {
     FILE *fp_dados = fopen("data/plantas.dat", "ab");
     if (fp_dados == NULL) {
