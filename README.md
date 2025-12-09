@@ -6,7 +6,7 @@ Este projeto consiste em um sistema completo para catalogação de espécies de 
 
 ---
 
-## 👨‍💻 Equipe
+##Equipe
 * Erick
 * Gustavo
 * Icaro
@@ -50,9 +50,8 @@ Pré-requisitos
 Abra o terminal na pasta raiz do projeto (`TrabalhodaLana`) e execute:
 
 ```bash
-# Comando de Compilação
+--Comando de Compilação--
 cd trabalhodalana
-gcc main.c bplus.c plantas.c ocorrencias.c bioma.c distribuicao.c classificacao.c inv_bioma.c trie.c -o projeto_final.exe
-
-# Executar
+Remove-Item data\*.dat, data\*.idx
+gcc main.c bplus.c plantas.c ocorrencias.c bioma.c distribuicao.c classificacao.c inv_bioma.c trie.c importacao.c -o projeto_final.exe
 .\projeto_final.exe
