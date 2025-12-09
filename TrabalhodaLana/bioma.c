@@ -1,5 +1,5 @@
 #include "bioma.h"
-
+//GUstavo camilot
 __int64 salvar_bioma(const bioma_t *b) {
     FILE *fp = fopen("data/biomas.dat", "ab");
     if (fp == NULL) {
