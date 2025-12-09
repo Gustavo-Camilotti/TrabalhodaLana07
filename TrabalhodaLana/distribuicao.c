@@ -1,4 +1,5 @@
 #include "distribuicao.h"
+//gustavo camilotti
 
 __int64 salvar_distribuicao(const distribuicao_t *d) {
     FILE *fp = fopen("data/distribuicoes.dat", "ab");
